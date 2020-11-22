@@ -22,7 +22,6 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include <cpuid.h>
 #include <errno.h>
 #include <immintrin.h>
 #include <limits.h>
@@ -32,13 +31,15 @@
 
 #include "./output.h"
 #include "./options.h"
+#include "./rand64-hw.h"
+#include "./rand64-sw.h"
 
-/* Hardware implementation.  */
+/* Hardware implementation.  
 
-/* Description of the current CPU.  */
+
 struct cpuid { unsigned eax, ebx, ecx, edx; };
 
-/* Return information about the CPU.  See <http://wiki.osdev.org/CPUID>.  */
+
 static struct cpuid
 cpuid (unsigned int leaf, unsigned int subleaf)
 {
@@ -50,7 +51,7 @@ cpuid (unsigned int leaf, unsigned int subleaf)
   return result;
 }
 
-/* Return true if the CPU supports the RDRAND instruction.  */
+
 static _Bool
 rdrand_supported (void)
 {
@@ -58,13 +59,13 @@ rdrand_supported (void)
   return (extended.ecx & bit_RDRND) != 0;
 }
 
-/* Initialize the hardware rand64 implementation.  */
+
 static void
 hardware_rand64_init (void)
 {
 }
 
-/* Return a random value, using hardware operations.  */
+
 static unsigned long long
 hardware_rand64 (void)
 {
@@ -74,7 +75,7 @@ hardware_rand64 (void)
   return x;
 }
 
-/* Finalize the hardware rand64 implementation.  */
+
 static void
 hardware_rand64_fini (void)
 {
@@ -82,12 +83,10 @@ hardware_rand64_fini (void)
 
 
 
-/* Software implementation.  */
+ Software implementation.  
 
-/* Input stream containing random bytes.  */
 static FILE *urandstream;
 
-/* Initialize the software rand64 implementation.  */
 static void
 software_rand64_init (void)
 {
@@ -96,7 +95,7 @@ software_rand64_init (void)
     abort ();
 }
 
-/* Return a random value, using software operations.  */
+
 static unsigned long long
 software_rand64 (void)
 {
@@ -106,14 +105,13 @@ software_rand64 (void)
   return x;
 }
 
-/* Finalize the software rand64 implementation.  */
 static void
 software_rand64_fini (void)
 {
   fclose (urandstream);
 }
 
-/*
+
 static bool
 writebytes (unsigned long long x, int nbytes)
 {
