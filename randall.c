@@ -31,6 +31,7 @@
 #include <stdlib.h>
 
 #include "./output.h"
+#include "./options.h"
 
 /* Hardware implementation.  */
 
@@ -133,7 +134,9 @@ writebytes (unsigned long long x, int nbytes)
 int
 main (int argc, char **argv)
 {
-  /* Check arguments.  */
+  int nbytes = options_processing(argc, argv);
+ 
+  /* Check arguments. 
   bool valid = false;
   long long nbytes;
   if (argc == 2)
@@ -146,11 +149,13 @@ main (int argc, char **argv)
       else
 	valid = !*endptr && 0 <= nbytes;
     }
+  
   if (!valid)
     {
       fprintf (stderr, "%s: usage: %s NBYTES\n", argv[0], argv[0]);
       return 1;
     }
+  */
 
   /* If there's no work to do, don't worry about which library to use.  */
   if (nbytes == 0)
