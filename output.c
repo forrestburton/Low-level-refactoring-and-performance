@@ -2,7 +2,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-static bool
+//does the output
+bool
 writebytes (unsigned long long x, int nbytes)
 {
   do

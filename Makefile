@@ -20,7 +20,7 @@ OPTIMIZE = -Og
 
 # The C compiler and its options.
 CC = gcc
-CFLAGS = $(OPTIMIZE) -g3 -Wall -Wextra -fanalyzer \
+CFLAGS = $(OPTIMIZE) -g3 -Wall -Wextra \
   -march=native -mtune=native -mrdrnd
 
 # The archiver command, its options and filename extension.
@@ -30,8 +30,8 @@ TAREXT = txz
 
 default: randall
 
-randall: randall.c
-	$(CC) $(CFLAGS) $@.c -o $@
+randall: *.c
+	$(CC) $(CFLAGS) *.c -o $@
 
 assignment: randall-assignment.$(TAREXT)
 assignment-files = COPYING Makefile randall.c

@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./output.h"
+
 /* Hardware implementation.  */
 
 /* Description of the current CPU.  */
@@ -110,6 +112,7 @@ software_rand64_fini (void)
   fclose (urandstream);
 }
 
+/*
 static bool
 writebytes (unsigned long long x, int nbytes)
 {
@@ -124,6 +127,7 @@ writebytes (unsigned long long x, int nbytes)
 
   return true;
 }
+*/
 
 /* Main program, which outputs N bytes of random data.  */
 int
