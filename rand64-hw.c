@@ -1,5 +1,5 @@
-#include <cpuid.h>
 #include <immintrin.h>
+#include "rand64-hw.h"
 
 
 /* Hardware implementation.  */

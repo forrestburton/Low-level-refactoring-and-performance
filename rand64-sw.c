@@ -1,6 +1,6 @@
 #include <immintrin.h>
 #include <stdio.h>
-
+#include "rand64-sw.h"
 
 /* Software implementation.  */
 
