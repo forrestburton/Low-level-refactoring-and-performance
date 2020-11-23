@@ -181,9 +181,10 @@ main (int argc, char **argv)
   }
   else if (opts.input == SLASH_F)  //use file path instead of /dev/random in sofware impl
   {
-    //initialize = 
-    //rand64 = 
-    //finalize = 
+    rsrc = opts.r_src;
+    initialize = software_file_init; 
+    rand64 = software_file;
+    finalize = software_file_fini;
   }
   else 
   {

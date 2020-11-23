@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "rand64-sw.h"
 
+char* rsrc;
 /* Software implementation.  */
 
 /* Input stream containing random bytes.  */
@@ -39,7 +40,7 @@ software_rand64_fini (void)
 void
 software_file_init (void)
 {
-  urandstream = fopen ("/dev/random", "r");
+  urandstream = fopen (rsrc, "r");
   if (! urandstream)
     abort ();
 }

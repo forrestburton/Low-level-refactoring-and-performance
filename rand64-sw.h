@@ -1,3 +1,5 @@
+char* rsrc;
+
 void
 software_rand64_init (void);
 
