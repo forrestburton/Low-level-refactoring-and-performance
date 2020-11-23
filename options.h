@@ -10,7 +10,7 @@ struct opts
    enum Input input;
    char* r_src;
    enum Output output;
-   unsigned int block_size;
+   int block_size;
 };
 
 void

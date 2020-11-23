@@ -208,9 +208,18 @@ main (int argc, char **argv)
 
   do
     {
+      int outbytes;
       unsigned long long x = rand64 ();
-      int outbytes = opts.nbytes < wordsize ? opts.nbytes : wordsize;
-      if (!writebytes (x, outbytes))
+      if (opts.block_size == -1) {
+        outbytes = opts.nbytes < wordsize ? opts.nbytes : wordsize;
+      }
+      else {
+        outbytes = opts.block_size*1024;
+        if (opts.nbytes < outbytes) { //account for remainder
+          outbytes = opts.nbytes;
+        }
+      }
+      if (!writebytes (x, outbytes, opts.block_size))
 	{
 	  output_errno = errno;
 	  break;

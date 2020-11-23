@@ -11,6 +11,7 @@
 void
 options_processing(int argc, char **argv, struct opts* opts) {
   opts->valid = false;
+  opts->block_size = -1;
   int c;
   while ((c = getopt(argc, argv, ":o:i:")) != -1) {
         switch(c) {
