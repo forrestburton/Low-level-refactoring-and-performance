@@ -3,51 +3,57 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include "./options.h"
 
 
 /* Check arguments.  */
-int
-options_processing(int argc, char **argv) {
-  bool valid = false;
-  long long nbytes;
-  if (argc == 2)
-    {
-      char *endptr;
-      errno = 0;
-      nbytes = strtoll (argv[1], &endptr, 10);
-      if (errno)
-	perror (argv[1]);
-      else
-	valid = !*endptr && 0 <= nbytes;
-    }
-    
-  if (!valid)
-  {
-    fprintf (stderr, "%s: usage: %s NBYTES\n", argv[0], argv[0]);
-    return 1;
-  }
-
+void
+options_processing(int argc, char **argv, struct opts* opts) {
+  opts->valid = false;
   int c;
   while ((c = getopt(argc, argv, ":o:i:")) != -1) {
         switch(c) {
         case 'i':
-            printf("case i");
+            if(strcmp("rdrand", optarg) == 0) {
+              opts->input = RDRAND;
+            }
+            else if(strcmp("mrand48_r", optarg) == 0) {
+              opts->input = MRAND48_R;
+            }
+            else if('/' == optarg[0]) {
+              opts->input = SLASH_F;
+              opts->r_src = optarg;
+            }
+            else {
+              break;
+            }
+            opts->valid = true;
             break;
         case 'o':
-            printf("case o");
+            if(strcmp("stdout", optarg) == 0) {
+              opts->output = STDOUT;
+            }
+            else {
+              opts->output = N;
+              opts->block_size = atoi(optarg);
+            }
+            opts->valid = true;
             break;
         case ':':       /* -f or -o without operand */
-            fprintf(stderr,
-                "Option -%c requires an operand\n", optopt);
-            return 1;
             break;
         case '?':
-            fprintf(stderr,
-                "Unrecognized option: '-%c'\n", optopt);
-            return 1;
+           break;
         }
-    }
-  return nbytes;
+  }
+  
+  if (optind >= argc) {
+    return;
+  }
+
+  opts->nbytes = atol(argv[optind]);
+  if(opts->nbytes >= 0) {
+    opts->valid = true;
+  }
 }
   

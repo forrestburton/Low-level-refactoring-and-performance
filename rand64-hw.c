@@ -1,4 +1,6 @@
 #include <immintrin.h>
+#include <stdio.h>
+#include <time.h>    // time()
 #include "rand64-hw.h"
 
 
@@ -28,6 +30,9 @@ rdrand_supported (void)
 }
 
 /* Initialize the hardware rand64 implementation.  */
+struct drand48_data buf = {0};
+long int a, b;
+
 void
 hardware_rand64_init (void)
 {
@@ -48,3 +53,32 @@ void
 hardware_rand64_fini (void)
 {
 }
+
+
+
+//MRAND_48 option initialization
+void
+mrand48_rng_init (void)
+{
+  srand48_r(time(NULL), &buf);
+}
+
+/* Return a random value, using mrand48 hardware operations.  */
+unsigned long long
+mrand48_rng (void)
+{
+  mrand48_r(&buf, &a);
+  mrand48_r(&buf, &b);
+
+  unsigned long long int x = (((unsigned long long) a) << 32) | ((unsigned long long) b & 0x00000000FFFFFFFF);
+  return x;
+}
+
+/* Finalize the hardware mrand48 implementation.  */
+void
+mrand48_rng_fini (void)
+{
+}
+
+
+

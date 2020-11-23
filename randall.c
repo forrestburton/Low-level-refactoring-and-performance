@@ -132,7 +132,15 @@ writebytes (unsigned long long x, int nbytes)
 int
 main (int argc, char **argv)
 {
-  int nbytes = options_processing(argc, argv);
+  //dynamically allocate opts struct
+  struct opts opts;
+  options_processing(argc, argv, &opts);
+
+  if (opts.valid == false)
+  {
+    fprintf (stderr, "%s: usage: %s invalid option\n", argv[0], argv[0]);
+    return 1;
+  }
  
   /* Check arguments. 
   bool valid = false;
@@ -156,7 +164,7 @@ main (int argc, char **argv)
   */
 
   /* If there's no work to do, don't worry about which library to use.  */
-  if (nbytes == 0)
+  if (opts.nbytes == 0)
     return 0;
 
   /* Now that we know we have work to do, arrange to use the
@@ -164,18 +172,34 @@ main (int argc, char **argv)
   void (*initialize) (void);
   unsigned long long (*rand64) (void);
   void (*finalize) (void);
-  if (rdrand_supported ())
-    {
-      initialize = hardware_rand64_init;
-      rand64 = hardware_rand64;
-      finalize = hardware_rand64_fini;
-    }
-  else
-    {
-      initialize = software_rand64_init;
-      rand64 = software_rand64;
-      finalize = software_rand64_fini;
-    }
+
+  if (opts.input == MRAND48_R) 
+  {
+    initialize = mrand48_rng_init;
+    rand64 = mrand48_rng;
+    finalize = mrand48_rng_fini;
+  }
+  else if (opts.input == SLASH_F)  //use file path instead of /dev/random in sofware impl
+  {
+    //initialize = 
+    //rand64 = 
+    //finalize = 
+  }
+  else 
+  {
+    if (rdrand_supported ())
+      {
+        initialize = hardware_rand64_init;
+        rand64 = hardware_rand64;
+        finalize = hardware_rand64_fini;
+      }
+    else
+      {
+        initialize = software_rand64_init;
+        rand64 = software_rand64;
+        finalize = software_rand64_fini;
+      }
+  }
 
   initialize ();
   int wordsize = sizeof rand64 ();
@@ -184,15 +208,15 @@ main (int argc, char **argv)
   do
     {
       unsigned long long x = rand64 ();
-      int outbytes = nbytes < wordsize ? nbytes : wordsize;
+      int outbytes = opts.nbytes < wordsize ? opts.nbytes : wordsize;
       if (!writebytes (x, outbytes))
 	{
 	  output_errno = errno;
 	  break;
 	}
-      nbytes -= outbytes;
+      opts.nbytes -= outbytes;
     }
-  while (0 < nbytes);
+  while (0 < opts.nbytes);
 
   if (fclose (stdout) != 0)
     output_errno = errno;
