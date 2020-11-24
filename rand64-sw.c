@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "rand64-sw.h"
 
-char* rsrc;
+
 /* Software implementation.  */
 
 /* Input stream containing random bytes.  */
