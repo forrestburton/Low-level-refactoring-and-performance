@@ -36,6 +36,8 @@
 #include "./rand64-hw.h"
 #include "./rand64-sw.h"
 
+char* rsrc;
+
 /* Hardware implementation.  
 
 

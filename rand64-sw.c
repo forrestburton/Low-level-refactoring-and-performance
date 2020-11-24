@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "rand64-sw.h"
 
-
 /* Software implementation.  */
 
 /* Input stream containing random bytes.  */
