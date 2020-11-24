@@ -8,10 +8,8 @@
 
 //does the output
 bool
-writebytes (unsigned long long x, int nbytes, int block_size)
+writebytes (unsigned long long x, int nbytes)
 {
-  if (block_size == -1)
-  {
     do
       {
         if (putchar (x) < 0 )
@@ -22,17 +20,4 @@ writebytes (unsigned long long x, int nbytes, int block_size)
     while (0 < nbytes);
 
     return true;
-  }
-  else
-  {
-    int buffer_size = nbytes;
-    //fprintf (stderr, "%d \n", buffer_size);
-
-    char *buffer = (char*) malloc(buffer_size); //allocate buffer of size block_size KB
-    memcpy(buffer, &x, buffer_size); //copy part of x to buffer
-    write(1, buffer, buffer_size); //print out buffer in blocks of size 
-    
-    free(buffer);
-    return true; 
-  }
 }

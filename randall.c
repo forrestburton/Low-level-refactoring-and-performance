@@ -28,6 +28,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "./output.h"
 #include "./options.h"
@@ -205,28 +207,85 @@ main (int argc, char **argv)
   initialize ();
   int wordsize = sizeof rand64 ();
   int output_errno = 0;
+  long long outbytes;
 
-  do
-    {
-      int outbytes;
-      unsigned long long x = rand64 ();
-      if (opts.block_size == -1) {
+   
+  if (opts.block_size == -1) { //if no -o option
+    do
+      {
+        unsigned long long x = rand64 ();
         outbytes = opts.nbytes < wordsize ? opts.nbytes : wordsize;
+        if (!writebytes (x, outbytes))
+          {
+            output_errno = errno;
+            break;
+          }
+        opts.nbytes -= outbytes;
       }
-      else {
-        outbytes = opts.block_size*1024;
-        if (opts.nbytes < outbytes) { //account for remainder
-          outbytes = opts.nbytes;
+    while (0 < opts.nbytes);
+  }
+  else { //-o option
+    char *buffer;
+    outbytes = opts.block_size*1024.0;
+    int numloops = (int)(opts.nbytes / outbytes);
+    int j = numloops;
+
+    //fprintf (stderr, "%d \n", numloops);
+    while(j > 0) {
+        buffer = (char*) malloc(outbytes);
+
+        if (opts.input == MRAND48_R) {
+          for (int i = 0; i < (outbytes/4); i++) {
+            unsigned long long x = rand64 ();
+            memcpy(buffer + 4*i, &x, 4);  // i is sort a counter which goes until size of output buffer
+          }
         }
+        else {
+          for (int i = 0; i < (outbytes/8); i++) {
+            unsigned long long x = rand64 ();
+            memcpy(buffer + 8*i, &x, 8);  // i is sort a counter which goes until size of output buffer
+          }
+        }
+        if (!write(1, buffer, outbytes))
+        {
+          output_errno = errno;
+          break;
+        }
+        free(buffer);
+        j--;
+    } 
+     
+
+    int remainder = opts.nbytes - (outbytes*numloops);
+    buffer = (char*) malloc(remainder);
+    if (opts.input == MRAND48_R) {
+      if (remainder < 4 && remainder > 0) {
+         unsigned long long x = rand64 ();
+         memcpy(buffer, &x, remainder);
       }
-      if (!writebytes (x, outbytes, opts.block_size))
-	{
-	  output_errno = errno;
-	  break;
-	}
-      opts.nbytes -= outbytes;
+
+      for (int i = 0; i < (remainder/4); i++) {
+        unsigned long long x = rand64 ();
+        memcpy(buffer + 4*i, &x, 4);  // i is sort a counter which goes until size
+      }
     }
-  while (0 < opts.nbytes);
+    else {
+      if (remainder < 8 && remainder > 0) {
+         unsigned long long x = rand64 ();
+         memcpy(buffer, &x, remainder);
+      }
+      for (int i = 0; i < (remainder/8); i++) {
+         unsigned long long x = rand64 ();
+         memcpy(buffer + 8*i, &x, 8);  // i is sort a counter which goes until size of output buffer
+      }
+    }
+    if (remainder > 0) {
+      if (!write(1, buffer, remainder)) {
+        output_errno = errno;
+      } 
+    }
+    free(buffer);
+  }
 
   if (fclose (stdout) != 0)
     output_errno = errno;
